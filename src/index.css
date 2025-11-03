@@ -41,6 +41,10 @@ All colors MUST be HSL.
 
     --radius: 1rem;
 
+    /* Glassmorphism */
+    --glass-bg: 255 255 255 / 0.7;
+    --glass-border: 255 255 255 / 0.2;
+
     --sidebar-background: 0 0% 98%;
 
     --sidebar-foreground: 240 5.3% 26.1%;
@@ -59,7 +63,7 @@ All colors MUST be HSL.
   }
 
   .dark {
-    --background: 210 24% 10%;
+    --background: 210 24% 8%;
     --foreground: 0 0% 98%;
 
     --card: 210 24% 12%;
@@ -68,16 +72,16 @@ All colors MUST be HSL.
     --popover: 210 24% 12%;
     --popover-foreground: 0 0% 98%;
 
-    --primary: 142 76% 36%;
+    --primary: 142 76% 40%;
     --primary-foreground: 0 0% 100%;
-    --primary-light: 142 76% 92%;
-    --primary-hover: 142 76% 32%;
+    --primary-light: 142 76% 20%;
+    --primary-hover: 142 76% 45%;
 
     --secondary: 210 24% 16%;
     --secondary-foreground: 0 0% 98%;
 
     --muted: 210 24% 16%;
-    --muted-foreground: 210 15% 65%;
+    --muted-foreground: 210 15% 70%;
 
     --accent: 210 24% 16%;
     --accent-foreground: 0 0% 98%;
@@ -87,7 +91,11 @@ All colors MUST be HSL.
 
     --border: 210 24% 20%;
     --input: 210 24% 20%;
-    --ring: 142 76% 36%;
+    --ring: 142 76% 40%;
+
+    /* Glassmorphism for dark mode */
+    --glass-bg: 0 0 0 / 0.4;
+    --glass-border: 255 255 255 / 0.1;
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;
@@ -101,10 +109,23 @@ All colors MUST be HSL.
 
 @layer base {
   * {
-    @apply border-border;
+    @apply border-border transition-colors;
   }
 
   body {
     @apply bg-background text-foreground;
+  }
+
+  /* Glassmorphism utility classes */
+  .glass {
+    @apply bg-white/70 backdrop-blur-xl border border-white/20 dark:bg-black/40 dark:border-white/10;
+  }
+
+  .glass-card {
+    @apply bg-white/80 backdrop-blur-lg border border-white/30 dark:bg-black/50 dark:border-white/10;
+  }
+
+  .glass-header {
+    @apply bg-white/60 backdrop-blur-md border-b border-white/20 dark:bg-black/30 dark:border-white/10;
   }
 }

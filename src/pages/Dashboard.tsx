@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "@/components/auth/AuthProvider";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -84,9 +85,9 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-light to-white">
+    <div className="min-h-screen bg-gradient-to-br from-primary-light to-white dark:from-primary-light/10 dark:to-background">
       {/* Header */}
-      <header className="border-b bg-white/80 backdrop-blur-sm">
+      <header className="glass-header">
         <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -95,14 +96,17 @@ const Dashboard = () => {
                 HealthMate AI
               </h1>
             </div>
-            <Button
-              variant="ghost"
-              onClick={signOut}
-              className="rounded-xl hover:bg-destructive/10 hover:text-destructive"
-            >
-              <LogOut className="mr-2 h-4 w-4" />
-              Sign Out
-            </Button>
+            <div className="flex items-center gap-2">
+              <ThemeToggle />
+              <Button
+                variant="ghost"
+                onClick={signOut}
+                className="rounded-xl hover:bg-destructive/10 hover:text-destructive"
+              >
+                <LogOut className="mr-2 h-4 w-4" />
+                Sign Out
+              </Button>
+            </div>
           </div>
         </div>
       </header>
@@ -120,7 +124,7 @@ const Dashboard = () => {
         {/* Quick Actions */}
         <div className="mb-8 grid gap-4 sm:grid-cols-3">
           <Card
-            className="cursor-pointer rounded-2xl border-0 p-6 shadow-lg transition-all hover:scale-105 hover:shadow-xl"
+            className="glass-card cursor-pointer rounded-2xl border-0 p-6 shadow-xl transition-all hover:scale-105 hover:shadow-2xl"
             onClick={() => navigate("/chat")}
           >
             <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary">
@@ -133,7 +137,7 @@ const Dashboard = () => {
           </Card>
 
           <Card
-            className="cursor-pointer rounded-2xl border-0 p-6 shadow-lg transition-all hover:scale-105 hover:shadow-xl"
+            className="glass-card cursor-pointer rounded-2xl border-0 p-6 shadow-xl transition-all hover:scale-105 hover:shadow-2xl"
             onClick={() => navigate("/reports")}
           >
             <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary">
@@ -146,7 +150,7 @@ const Dashboard = () => {
           </Card>
 
           <Card
-            className="cursor-pointer rounded-2xl border-0 p-6 shadow-lg transition-all hover:scale-105 hover:shadow-xl"
+            className="glass-card cursor-pointer rounded-2xl border-0 p-6 shadow-xl transition-all hover:scale-105 hover:shadow-2xl"
             onClick={() => navigate("/diet")}
           >
             <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary">
@@ -162,7 +166,7 @@ const Dashboard = () => {
         {/* Recent Activity */}
         <div className="grid gap-8 lg:grid-cols-2">
           {/* Recent Chats */}
-          <Card className="rounded-2xl border-0 p-6 shadow-lg">
+          <Card className="glass-card rounded-2xl border-0 p-6 shadow-xl">
             <h3 className="mb-4 text-xl font-semibold">Recent Chats</h3>
             {chats.length === 0 ? (
               <p className="text-sm text-muted-foreground">
@@ -191,7 +195,7 @@ const Dashboard = () => {
           </Card>
 
           {/* Recent Reports */}
-          <Card className="rounded-2xl border-0 p-6 shadow-lg">
+          <Card className="glass-card rounded-2xl border-0 p-6 shadow-xl">
             <h3 className="mb-4 text-xl font-semibold">Recent Reports</h3>
             {reports.length === 0 ? (
               <p className="text-sm text-muted-foreground">

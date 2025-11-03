@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "@/components/auth/AuthProvider";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -51,8 +52,11 @@ const Auth = () => {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-primary-light to-white p-4">
-      <Card className="w-full max-w-md space-y-8 rounded-2xl border-0 p-8 shadow-lg">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-primary-light to-white dark:from-primary-light/10 dark:to-background p-4">
+      <div className="absolute right-4 top-4">
+        <ThemeToggle />
+      </div>
+      <Card className="glass-card w-full max-w-md space-y-8 rounded-2xl border-0 p-8 shadow-2xl">
         <div className="text-center">
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary">
             <Heart className="h-8 w-8 text-white" />

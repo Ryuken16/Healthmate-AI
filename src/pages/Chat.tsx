@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/components/auth/AuthProvider";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -156,23 +157,26 @@ const Chat = () => {
   };
 
   return (
-    <div className="flex h-screen flex-col bg-gradient-to-br from-primary-light to-white">
+    <div className="flex h-screen flex-col bg-gradient-to-br from-primary-light to-white dark:from-primary-light/10 dark:to-background">
       {/* Header */}
-      <header className="border-b bg-white/80 backdrop-blur-sm">
+      <header className="glass-header">
         <div className="mx-auto max-w-4xl px-4 py-4">
-          <div className="flex items-center gap-4">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => navigate("/dashboard")}
-              className="rounded-xl"
-            >
-              <ArrowLeft className="h-5 w-5" />
-            </Button>
-            <div className="flex items-center gap-2">
-              <Heart className="h-6 w-6 text-primary" />
-              <h1 className="text-xl font-semibold">Health Chat</h1>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => navigate("/dashboard")}
+                className="rounded-xl"
+              >
+                <ArrowLeft className="h-5 w-5" />
+              </Button>
+              <div className="flex items-center gap-2">
+                <Heart className="h-6 w-6 text-primary" />
+                <h1 className="text-xl font-semibold">Health Chat</h1>
+              </div>
             </div>
+            <ThemeToggle />
           </div>
         </div>
       </header>
@@ -181,7 +185,7 @@ const Chat = () => {
       <div className="flex-1 overflow-y-auto px-4 py-6">
         <div className="mx-auto max-w-4xl space-y-4">
           {messages.length === 0 && (
-            <Card className="rounded-2xl border-0 bg-primary-light/50 p-8 text-center shadow-sm">
+            <Card className="glass rounded-2xl border-0 p-8 text-center shadow-lg">
               <Heart className="mx-auto mb-4 h-12 w-12 text-primary" />
               <h3 className="mb-2 text-lg font-semibold">
                 How can I help you today?
@@ -200,10 +204,10 @@ const Chat = () => {
               }`}
             >
               <Card
-                className={`max-w-[80%] rounded-2xl border-0 p-4 shadow-md ${
+                className={`max-w-[80%] rounded-2xl border-0 p-4 shadow-lg ${
                   message.role === "user"
                     ? "bg-primary text-white"
-                    : "bg-white"
+                    : "glass-card"
                 }`}
               >
                 <p className="text-sm leading-relaxed whitespace-pre-wrap">
@@ -215,7 +219,7 @@ const Chat = () => {
 
           {loading && (
             <div className="flex justify-start">
-              <Card className="rounded-2xl border-0 bg-white p-4 shadow-md">
+              <Card className="glass-card rounded-2xl border-0 p-4 shadow-lg">
                 <div className="flex items-center gap-2">
                   <Loader2 className="h-4 w-4 animate-spin text-primary" />
                   <span className="text-sm text-muted-foreground">
@@ -242,7 +246,7 @@ const Chat = () => {
       </div>
 
       {/* Input */}
-      <div className="border-t bg-white/80 px-4 py-4 backdrop-blur-sm">
+      <div className="glass-header px-4 py-4">
         <div className="mx-auto flex max-w-4xl gap-2">
           <Input
             value={input}

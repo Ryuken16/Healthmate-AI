@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/components/auth/AuthProvider";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -104,30 +105,33 @@ const Reports = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-light to-white">
+    <div className="min-h-screen bg-gradient-to-br from-primary-light to-white dark:from-primary-light/10 dark:to-background">
       {/* Header */}
-      <header className="border-b bg-white/80 backdrop-blur-sm">
+      <header className="glass-header">
         <div className="mx-auto max-w-4xl px-4 py-4">
-          <div className="flex items-center gap-4">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => navigate("/dashboard")}
-              className="rounded-xl"
-            >
-              <ArrowLeft className="h-5 w-5" />
-            </Button>
-            <div className="flex items-center gap-2">
-              <Heart className="h-6 w-6 text-primary" />
-              <h1 className="text-xl font-semibold">Medical Reports</h1>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => navigate("/dashboard")}
+                className="rounded-xl"
+              >
+                <ArrowLeft className="h-5 w-5" />
+              </Button>
+              <div className="flex items-center gap-2">
+                <Heart className="h-6 w-6 text-primary" />
+                <h1 className="text-xl font-semibold">Medical Reports</h1>
+              </div>
             </div>
+            <ThemeToggle />
           </div>
         </div>
       </header>
 
       <main className="mx-auto max-w-4xl px-4 py-8">
         {/* Upload Section */}
-        <Card className="mb-8 rounded-2xl border-0 p-8 text-center shadow-lg">
+        <Card className="glass-card mb-8 rounded-2xl border-0 p-8 text-center shadow-xl">
           <Upload className="mx-auto mb-4 h-12 w-12 text-primary" />
           <h2 className="mb-2 text-xl font-semibold">Upload Medical Report</h2>
           <p className="mb-4 text-sm text-muted-foreground">
@@ -175,7 +179,7 @@ const Reports = () => {
               <Loader2 className="h-8 w-8 animate-spin text-primary" />
             </div>
           ) : reports.length === 0 ? (
-            <Card className="rounded-2xl border-0 bg-white p-8 text-center shadow-sm">
+            <Card className="glass rounded-2xl border-0 p-8 text-center shadow-lg">
               <FileText className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
               <p className="text-muted-foreground">
                 No reports yet. Upload your first report!
@@ -186,7 +190,7 @@ const Reports = () => {
               {reports.map((report) => (
                 <Card
                   key={report.id}
-                  className="cursor-pointer rounded-2xl border-0 p-6 shadow-md transition-all hover:shadow-lg"
+                  className="glass-card cursor-pointer rounded-2xl border-0 p-6 shadow-xl transition-all hover:shadow-2xl"
                 >
                   <div className="flex items-start gap-4">
                     <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary-light">
