@@ -1,0 +1,10 @@
+project_id = "qfbankuceealyvupidif"
+
+[functions.health-chat]
+verify_jwt = true
+
+[functions.analyze-report]
+verify_jwt = true
+
+[functions.generate-diet-suggestions]
+verify_jwt = true
