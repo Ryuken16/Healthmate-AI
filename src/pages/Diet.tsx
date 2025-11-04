@@ -25,13 +25,17 @@ const Diet = () => {
       const { data, error } = await supabase.functions.invoke(
         "generate-diet-suggestions",
         {
-          body: { prompt: prompt.trim() },
+          body: { userId: user.id, prompt: prompt.trim() },
         }
       );
 
       if (error) throw error;
 
-      setSuggestions(data.suggestions);
+      if (typeof data.suggestions === 'string') {
+        setSuggestions(data.suggestions);
+      } else {
+        setSuggestions(JSON.stringify(data.suggestions, null, 2));
+      }
       toast({
         title: "Success!",
         description: "Your personalized diet plan is ready",
