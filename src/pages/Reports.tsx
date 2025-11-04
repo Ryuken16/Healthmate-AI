@@ -105,35 +105,33 @@ const Reports = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-light to-white dark:from-primary-light/10 dark:to-background">
+    <div className="min-h-screen bg-gradient-to-br from-primary-light via-background to-accent">
       {/* Header */}
-      <header className="glass-header">
-        <div className="mx-auto max-w-4xl px-4 py-4">
+      <header className="glass-header sticky top-0 z-50">
+        <div className="container mx-auto max-w-5xl px-4 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => navigate("/dashboard")}
-                className="rounded-xl"
-              >
-                <ArrowLeft className="h-5 w-5" />
-              </Button>
-              <div className="flex items-center gap-2">
-                <Heart className="h-6 w-6 text-primary" />
-                <h1 className="text-xl font-semibold">Medical Reports</h1>
-              </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => navigate("/dashboard")}
+              className="rounded-xl"
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+            <div className="flex items-center gap-2">
+              <FileText className="h-6 w-6 text-primary" />
+              <h1 className="text-xl font-semibold hidden sm:inline">Medical Reports</h1>
             </div>
             <ThemeToggle />
           </div>
         </div>
       </header>
 
-      <main className="mx-auto max-w-4xl px-4 py-8">
+      <main className="container mx-auto max-w-5xl px-4 py-8">
         {/* Upload Section */}
-        <Card className="glass-card mb-8 rounded-2xl border-0 p-8 text-center shadow-xl">
+        <Card className="glass-card mb-8 rounded-2xl border-primary/10 p-6 md:p-8 text-center shadow-xl">
           <Upload className="mx-auto mb-4 h-12 w-12 text-primary" />
-          <h2 className="mb-2 text-xl font-semibold">Upload Medical Report</h2>
+          <h2 className="mb-2 text-xl md:text-2xl font-semibold">Upload Medical Report</h2>
           <p className="mb-4 text-sm text-muted-foreground">
             Upload your medical reports and get AI-powered summaries
           </p>
@@ -179,7 +177,7 @@ const Reports = () => {
               <Loader2 className="h-8 w-8 animate-spin text-primary" />
             </div>
           ) : reports.length === 0 ? (
-            <Card className="glass rounded-2xl border-0 p-8 text-center shadow-lg">
+            <Card className="glass-card rounded-2xl border-primary/10 p-8 text-center shadow-xl">
               <FileText className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
               <p className="text-muted-foreground">
                 No reports yet. Upload your first report!
@@ -190,14 +188,14 @@ const Reports = () => {
               {reports.map((report) => (
                 <Card
                   key={report.id}
-                  className="glass-card cursor-pointer rounded-2xl border-0 p-6 shadow-xl transition-all hover:shadow-2xl"
+                  className="glass-card cursor-pointer rounded-2xl border-primary/10 p-6 shadow-xl transition-all hover:shadow-2xl hover:scale-[1.02]"
                 >
-                  <div className="flex items-start gap-4">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary-light">
+                  <div className="flex flex-col sm:flex-row items-start gap-4">
+                    <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-primary-light">
                       <FileText className="h-6 w-6 text-primary" />
                     </div>
-                    <div className="flex-1">
-                      <h3 className="mb-1 font-semibold">{report.title}</h3>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="mb-1 font-semibold break-words">{report.title}</h3>
                       {report.summary && (
                         <p className="mb-2 text-sm text-muted-foreground">
                           {report.summary}

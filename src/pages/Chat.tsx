@@ -157,116 +157,122 @@ const Chat = () => {
   };
 
   return (
-    <div className="flex h-screen flex-col bg-gradient-to-br from-primary-light to-white dark:from-primary-light/10 dark:to-background">
+    <div className="flex h-screen flex-col bg-gradient-to-br from-primary-light via-background to-accent">
       {/* Header */}
       <header className="glass-header">
-        <div className="mx-auto max-w-4xl px-4 py-4">
+        <div className="mx-auto max-w-5xl px-4 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => navigate("/dashboard")}
-                className="rounded-xl"
-              >
-                <ArrowLeft className="h-5 w-5" />
-              </Button>
-              <div className="flex items-center gap-2">
-                <Heart className="h-6 w-6 text-primary" />
-                <h1 className="text-xl font-semibold">Health Chat</h1>
-              </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => navigate("/dashboard")}
+              className="rounded-xl"
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+            <div className="flex items-center gap-2">
+              <Heart className="h-6 w-6 text-primary" />
+              <h1 className="text-xl font-semibold hidden sm:inline">HealthMate</h1>
             </div>
             <ThemeToggle />
           </div>
         </div>
       </header>
 
-      {/* Messages */}
-      <div className="flex-1 overflow-y-auto px-4 py-6">
-        <div className="mx-auto max-w-4xl space-y-4">
+      {/* Messages Container - Centered like Grok */}
+      <div className="flex-1 overflow-y-auto">
+        <div className="mx-auto max-w-3xl px-4 py-8">
           {messages.length === 0 && (
-            <Card className="glass rounded-2xl border-0 p-8 text-center shadow-lg">
-              <Heart className="mx-auto mb-4 h-12 w-12 text-primary" />
-              <h3 className="mb-2 text-lg font-semibold">
-                How can I help you today?
-              </h3>
-              <p className="text-sm text-muted-foreground">
-                Ask me about symptoms, medications, or general health questions.
-              </p>
-            </Card>
+            <div className="flex flex-col items-center justify-center min-h-[60vh] text-center space-y-6">
+              <div className="p-6 rounded-full glass-card">
+                <Heart className="h-16 w-16 text-primary" />
+              </div>
+              <div className="space-y-2">
+                <h2 className="text-3xl font-bold">How can I help you today?</h2>
+                <p className="text-muted-foreground max-w-md">
+                  Ask me about symptoms, medications, or general health questions.
+                </p>
+              </div>
+            </div>
           )}
 
-          {messages.map((message) => (
-            <div
-              key={message.id}
-              className={`flex ${
-                message.role === "user" ? "justify-end" : "justify-start"
-              }`}
-            >
-              <Card
-                className={`max-w-[80%] rounded-2xl border-0 p-4 shadow-lg ${
-                  message.role === "user"
-                    ? "bg-primary text-white"
-                    : "glass-card"
+          <div className="space-y-6">
+            {messages.map((message) => (
+              <div
+                key={message.id}
+                className={`flex ${
+                  message.role === "user" ? "justify-end" : "justify-start"
                 }`}
               >
-                <p className="text-sm leading-relaxed whitespace-pre-wrap">
-                  {message.content}
-                </p>
-              </Card>
-            </div>
-          ))}
-
-          {loading && (
-            <div className="flex justify-start">
-              <Card className="glass-card rounded-2xl border-0 p-4 shadow-lg">
-                <div className="flex items-center gap-2">
-                  <Loader2 className="h-4 w-4 animate-spin text-primary" />
-                  <span className="text-sm text-muted-foreground">
-                    Thinking...
-                  </span>
+                <div
+                  className={`max-w-[85%] sm:max-w-[75%] rounded-3xl p-4 ${
+                    message.role === "user"
+                      ? "bg-primary text-white ml-auto"
+                      : "glass-card"
+                  }`}
+                >
+                  <p className="text-sm sm:text-base leading-relaxed whitespace-pre-wrap">
+                    {message.content}
+                  </p>
                 </div>
-              </Card>
-            </div>
-          )}
+              </div>
+            ))}
+
+            {loading && (
+              <div className="flex justify-start">
+                <div className="glass-card rounded-3xl p-4">
+                  <div className="flex items-center gap-2">
+                    <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                    <span className="text-sm text-muted-foreground">
+                      Thinking...
+                    </span>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
 
           <div ref={messagesEndRef} />
         </div>
       </div>
 
       {/* Disclaimer */}
-      <div className="border-t bg-amber-50 px-4 py-2">
-        <div className="mx-auto flex max-w-4xl items-center gap-2 text-xs text-amber-800">
-          <AlertCircle className="h-4 w-4 flex-shrink-0" />
-          <p>
-            This AI provides general health information only. Always consult a
-            healthcare professional for medical advice.
-          </p>
+      <div className="border-t glass-header">
+        <div className="mx-auto max-w-3xl px-4 py-2">
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <AlertCircle className="h-4 w-4 flex-shrink-0" />
+            <p>
+              AI provides general information only. Consult healthcare professionals for medical advice.
+            </p>
+          </div>
         </div>
       </div>
 
-      {/* Input */}
-      <div className="glass-header px-4 py-4">
-        <div className="mx-auto flex max-w-4xl gap-2">
-          <Input
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyPress={(e) => e.key === "Enter" && handleSend()}
-            placeholder="Describe your symptoms or ask a health question..."
-            className="rounded-xl"
-            disabled={loading}
-          />
-          <Button
-            onClick={handleSend}
-            disabled={!input.trim() || loading}
-            className="rounded-xl bg-primary px-6 hover:bg-primary-hover"
-          >
-            {loading ? (
-              <Loader2 className="h-5 w-5 animate-spin" />
-            ) : (
-              <Send className="h-5 w-5" />
-            )}
-          </Button>
+      {/* Input - Fixed at bottom like Grok */}
+      <div className="glass-header border-t">
+        <div className="mx-auto max-w-3xl px-4 py-4">
+          <div className="flex gap-2">
+            <Input
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyPress={(e) => e.key === "Enter" && !e.shiftKey && handleSend()}
+              placeholder="Ask about your health..."
+              className="rounded-2xl bg-card/50 border-primary/20 focus:border-primary px-6 py-6 text-base"
+              disabled={loading}
+            />
+            <Button
+              onClick={handleSend}
+              disabled={!input.trim() || loading}
+              size="icon"
+              className="rounded-2xl h-14 w-14 bg-primary hover:bg-primary-hover shrink-0"
+            >
+              {loading ? (
+                <Loader2 className="h-5 w-5 animate-spin" />
+              ) : (
+                <Send className="h-5 w-5" />
+              )}
+            </Button>
+          </div>
         </div>
       </div>
     </div>

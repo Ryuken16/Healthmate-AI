@@ -1,238 +1,176 @@
-import { useEffect, useState } from "react";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { supabase } from "@/integrations/supabase/client";
-import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { supabase } from "@/integrations/supabase/client";
+import { Heart, MessageSquare, FileText, Utensils, LogOut, Sparkles, TrendingUp, Activity } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import {
-  MessageSquare,
-  FileText,
-  Salad,
-  LogOut,
-  Heart,
-  Clock,
-} from "lucide-react";
-
-interface Chat {
-  id: string;
-  title: string;
-  updated_at: string;
-}
-
-interface Report {
-  id: string;
-  title: string;
-  created_at: string;
-  summary: string | null;
-}
 
 const Dashboard = () => {
-  const { user, signOut } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
-  const [chats, setChats] = useState<Chat[]>([]);
-  const [reports, setReports] = useState<Report[]>([]);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchDashboardData();
-  }, [user]);
-
-  const fetchDashboardData = async () => {
-    if (!user) return;
-
-    try {
-      // Fetch recent chats
-      const { data: chatsData } = await supabase
-        .from("chats")
-        .select("*")
-        .eq("user_id", user.id)
-        .order("updated_at", { ascending: false })
-        .limit(5);
-
-      // Fetch recent reports
-      const { data: reportsData } = await supabase
-        .from("health_reports")
-        .select("*")
-        .eq("user_id", user.id)
-        .order("created_at", { ascending: false })
-        .limit(5);
-
-      setChats(chatsData || []);
-      setReports(reportsData || []);
-    } catch (error) {
-      console.error("Error fetching dashboard data:", error);
-    } finally {
-      setLoading(false);
-    }
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    navigate("/");
   };
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    });
-  };
-
-  if (loading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-      </div>
-    );
-  }
+  const quickActions = [
+    {
+      icon: MessageSquare,
+      title: "Health Chat",
+      description: "Ask our AI assistant anything",
+      path: "/chat",
+      gradient: "from-blue-500 to-cyan-500",
+    },
+    {
+      icon: Utensils,
+      title: "Diet Plan",
+      description: "Generate personalized meal plans",
+      path: "/diet",
+      gradient: "from-purple-500 to-pink-500",
+    },
+    {
+      icon: FileText,
+      title: "Health Reports",
+      description: "Analyze your medical reports",
+      path: "/reports",
+      gradient: "from-orange-500 to-red-500",
+    },
+  ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-light to-white dark:from-primary-light/10 dark:to-background">
+    <div className="min-h-screen bg-gradient-to-br from-primary-light via-background to-accent">
       {/* Header */}
-      <header className="glass-header">
-        <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
+      <header className="glass-header sticky top-0 z-50">
+        <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
               <Heart className="h-8 w-8 text-primary" />
-              <h1 className="text-2xl font-bold text-foreground">
-                HealthMate AI
-              </h1>
+              <h1 className="text-2xl font-bold">HealthMate</h1>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
               <ThemeToggle />
               <Button
                 variant="ghost"
-                onClick={signOut}
-                className="rounded-xl hover:bg-destructive/10 hover:text-destructive"
+                size="icon"
+                onClick={handleLogout}
+                className="rounded-xl"
               >
-                <LogOut className="mr-2 h-4 w-4" />
-                Sign Out
+                <LogOut className="h-5 w-5" />
               </Button>
             </div>
           </div>
         </div>
       </header>
 
-      <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      <div className="container mx-auto px-4 py-8 max-w-7xl">
+        {/* Welcome Section */}
         <div className="mb-8">
-          <h2 className="text-3xl font-bold text-foreground">
-            Welcome back! 👋
-          </h2>
-          <p className="mt-2 text-muted-foreground">
-            Here's what's happening with your health today
-          </p>
+          <Card className="glass-card p-6 md:p-8 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent border-primary/20">
+            <div className="flex items-center gap-4 mb-4">
+              <Sparkles className="h-8 w-8 text-primary" />
+              <div>
+                <h2 className="text-2xl md:text-3xl font-bold">Welcome back!</h2>
+                <p className="text-muted-foreground mt-1 text-sm md:text-base">
+                  {user?.email}
+                </p>
+              </div>
+            </div>
+            <p className="text-base md:text-lg">
+              How can I help you with your health today?
+            </p>
+          </Card>
+        </div>
+
+        {/* Quick Stats */}
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 mb-8">
+          <Card className="glass-card p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground mb-1">Health Score</p>
+                <p className="text-3xl font-bold">85</p>
+              </div>
+              <Activity className="h-10 w-10 text-primary opacity-50" />
+            </div>
+          </Card>
+
+          <Card className="glass-card p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground mb-1">Active Days</p>
+                <p className="text-3xl font-bold">12</p>
+              </div>
+              <TrendingUp className="h-10 w-10 text-primary opacity-50" />
+            </div>
+          </Card>
+
+          <Card className="glass-card p-6 sm:col-span-2 lg:col-span-1">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground mb-1">Consultations</p>
+                <p className="text-3xl font-bold">24</p>
+              </div>
+              <MessageSquare className="h-10 w-10 text-primary opacity-50" />
+            </div>
+          </Card>
         </div>
 
         {/* Quick Actions */}
-        <div className="mb-8 grid gap-4 sm:grid-cols-3">
-          <Card
-            className="glass-card cursor-pointer rounded-2xl border-0 p-6 shadow-xl transition-all hover:scale-105 hover:shadow-2xl"
-            onClick={() => navigate("/chat")}
-          >
-            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary">
-              <MessageSquare className="h-6 w-6 text-white" />
-            </div>
-            <h3 className="mb-2 text-lg font-semibold">Chat with AI</h3>
-            <p className="text-sm text-muted-foreground">
-              Get instant health insights and advice
-            </p>
-          </Card>
-
-          <Card
-            className="glass-card cursor-pointer rounded-2xl border-0 p-6 shadow-xl transition-all hover:scale-105 hover:shadow-2xl"
-            onClick={() => navigate("/reports")}
-          >
-            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary">
-              <FileText className="h-6 w-6 text-white" />
-            </div>
-            <h3 className="mb-2 text-lg font-semibold">Upload Reports</h3>
-            <p className="text-sm text-muted-foreground">
-              AI-powered report summaries
-            </p>
-          </Card>
-
-          <Card
-            className="glass-card cursor-pointer rounded-2xl border-0 p-6 shadow-xl transition-all hover:scale-105 hover:shadow-2xl"
-            onClick={() => navigate("/diet")}
-          >
-            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary">
-              <Salad className="h-6 w-6 text-white" />
-            </div>
-            <h3 className="mb-2 text-lg font-semibold">Diet Suggestions</h3>
-            <p className="text-sm text-muted-foreground">
-              Personalized nutrition advice
-            </p>
-          </Card>
+        <div className="mb-8">
+          <h3 className="text-2xl font-bold mb-6">Quick Actions</h3>
+          <div className="grid gap-4 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {quickActions.map((action) => (
+              <Card
+                key={action.path}
+                className="glass-card p-6 cursor-pointer hover:scale-105 transition-all duration-300 group"
+                onClick={() => navigate(action.path)}
+              >
+                <div className={`inline-flex p-4 rounded-2xl bg-gradient-to-br ${action.gradient} mb-4 group-hover:scale-110 transition-transform`}>
+                  <action.icon className="h-8 w-8 text-white" />
+                </div>
+                <h4 className="text-xl font-bold mb-2">{action.title}</h4>
+                <p className="text-muted-foreground text-sm">{action.description}</p>
+              </Card>
+            ))}
+          </div>
         </div>
 
         {/* Recent Activity */}
-        <div className="grid gap-8 lg:grid-cols-2">
-          {/* Recent Chats */}
-          <Card className="glass-card rounded-2xl border-0 p-6 shadow-xl">
-            <h3 className="mb-4 text-xl font-semibold">Recent Chats</h3>
-            {chats.length === 0 ? (
-              <p className="text-sm text-muted-foreground">
-                No chats yet. Start a conversation!
-              </p>
-            ) : (
-              <div className="space-y-3">
-                {chats.map((chat) => (
-                  <div
-                    key={chat.id}
-                    className="flex cursor-pointer items-center justify-between rounded-xl border border-border p-3 transition-colors hover:bg-accent"
-                    onClick={() => navigate(`/chat/${chat.id}`)}
-                  >
-                    <div className="flex items-center gap-3">
-                      <MessageSquare className="h-5 w-5 text-primary" />
-                      <span className="text-sm font-medium">{chat.title}</span>
-                    </div>
-                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                      <Clock className="h-3 w-3" />
-                      {formatDate(chat.updated_at)}
-                    </div>
-                  </div>
-                ))}
+        <div>
+          <h3 className="text-2xl font-bold mb-6">Recent Activity</h3>
+          <Card className="glass-card p-4 md:p-6">
+            <div className="space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-4 p-4 rounded-xl bg-primary/5 border border-primary/10">
+                <MessageSquare className="h-8 w-8 text-primary flex-shrink-0" />
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold">Health Consultation</p>
+                  <p className="text-sm text-muted-foreground">Discussed symptoms and got recommendations</p>
+                </div>
+                <span className="text-sm text-muted-foreground whitespace-nowrap">2 hours ago</span>
               </div>
-            )}
-          </Card>
 
-          {/* Recent Reports */}
-          <Card className="glass-card rounded-2xl border-0 p-6 shadow-xl">
-            <h3 className="mb-4 text-xl font-semibold">Recent Reports</h3>
-            {reports.length === 0 ? (
-              <p className="text-sm text-muted-foreground">
-                No reports yet. Upload your first report!
-              </p>
-            ) : (
-              <div className="space-y-3">
-                {reports.map((report) => (
-                  <div
-                    key={report.id}
-                    className="flex cursor-pointer items-center justify-between rounded-xl border border-border p-3 transition-colors hover:bg-accent"
-                    onClick={() => navigate(`/reports/${report.id}`)}
-                  >
-                    <div className="flex items-center gap-3">
-                      <FileText className="h-5 w-5 text-primary" />
-                      <div>
-                        <span className="block text-sm font-medium">
-                          {report.title}
-                        </span>
-                        {report.summary && (
-                          <span className="text-xs text-muted-foreground line-clamp-1">
-                            {report.summary}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                      <Clock className="h-3 w-3" />
-                      {formatDate(report.created_at)}
-                    </div>
-                  </div>
-                ))}
+              <div className="flex flex-col sm:flex-row sm:items-center gap-4 p-4 rounded-xl bg-primary/5 border border-primary/10">
+                <Utensils className="h-8 w-8 text-primary flex-shrink-0" />
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold">Diet Plan Generated</p>
+                  <p className="text-sm text-muted-foreground">Created a new meal plan for weight loss</p>
+                </div>
+                <span className="text-sm text-muted-foreground whitespace-nowrap">1 day ago</span>
               </div>
-            )}
+
+              <div className="flex flex-col sm:flex-row sm:items-center gap-4 p-4 rounded-xl bg-primary/5 border border-primary/10">
+                <FileText className="h-8 w-8 text-primary flex-shrink-0" />
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold">Report Analyzed</p>
+                  <p className="text-sm text-muted-foreground">Blood test results reviewed</p>
+                </div>
+                <span className="text-sm text-muted-foreground whitespace-nowrap">3 days ago</span>
+              </div>
+            </div>
           </Card>
         </div>
-      </main>
+      </div>
     </div>
   );
 };
