@@ -1,12 +1,10 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/components/auth/AuthProvider";
-import { ThemeToggle } from "@/components/ThemeToggle";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Upload, FileText, Heart, Loader2 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { Upload, FileText, Loader2 } from "lucide-react";
 
 interface Report {
   id: string;
@@ -18,7 +16,6 @@ interface Report {
 
 const Reports = () => {
   const { user } = useAuth();
-  const navigate = useNavigate();
   const { toast } = useToast();
   const [reports, setReports] = useState<Report[]>([]);
   const [loading, setLoading] = useState(false);
@@ -54,10 +51,6 @@ const Reports = () => {
 
     setUploading(true);
     try {
-      // In a real app, you'd upload to storage here
-      // For now, we'll just create a report with the filename
-
-      // Call edge function to analyze the report
       const { data, error } = await supabase.functions.invoke(
         "analyze-report",
         {
@@ -67,7 +60,6 @@ const Reports = () => {
 
       if (error) throw error;
 
-      // Save report to database
       const { error: dbError } = await supabase.from("health_reports").insert({
         user_id: user.id,
         title: file.name,
@@ -105,29 +97,8 @@ const Reports = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-light via-background to-accent">
-      {/* Header */}
-      <header className="glass-header sticky top-0 z-50">
-        <div className="container mx-auto max-w-5xl px-4 py-4">
-          <div className="flex items-center justify-between">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => navigate("/dashboard")}
-              className="rounded-xl"
-            >
-              <ArrowLeft className="h-5 w-5" />
-            </Button>
-            <div className="flex items-center gap-2">
-              <FileText className="h-6 w-6 text-primary" />
-              <h1 className="text-xl font-semibold hidden sm:inline">Medical Reports</h1>
-            </div>
-            <ThemeToggle />
-          </div>
-        </div>
-      </header>
-
-      <main className="container mx-auto max-w-5xl px-4 py-8">
+    <div className="min-h-full bg-gradient-to-br from-primary-light via-background to-accent p-4 md:p-8">
+      <div className="max-w-5xl mx-auto">
         {/* Upload Section */}
         <Card className="glass-card mb-8 rounded-2xl border-primary/10 p-6 md:p-8 text-center shadow-xl">
           <Upload className="mx-auto mb-4 h-12 w-12 text-primary" />
@@ -138,7 +109,7 @@ const Reports = () => {
           <label htmlFor="file-upload">
             <Button
               disabled={uploading}
-              className="rounded-xl bg-primary hover:bg-primary-hover"
+              className="rounded-xl bg-primary hover:bg-primary/90"
               asChild
             >
               <span>
@@ -191,7 +162,7 @@ const Reports = () => {
                   className="glass-card cursor-pointer rounded-2xl border-primary/10 p-6 shadow-xl transition-all hover:shadow-2xl hover:scale-[1.02]"
                 >
                   <div className="flex flex-col sm:flex-row items-start gap-4">
-                    <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-primary-light">
+                    <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-primary/10">
                       <FileText className="h-6 w-6 text-primary" />
                     </div>
                     <div className="flex-1 min-w-0">
@@ -211,7 +182,7 @@ const Reports = () => {
             </div>
           )}
         </div>
-      </main>
+      </div>
     </div>
   );
 };

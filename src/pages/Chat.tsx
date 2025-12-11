@@ -1,13 +1,11 @@
 import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/components/auth/AuthProvider";
-import { ThemeToggle } from "@/components/ThemeToggle";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Send, Loader2, Heart, AlertCircle } from "lucide-react";
-import { useNavigate, useParams } from "react-router-dom";
+import { Send, Loader2, Heart, AlertCircle } from "lucide-react";
+import { useParams } from "react-router-dom";
 
 interface Message {
   id: string;
@@ -19,7 +17,6 @@ interface Message {
 const Chat = () => {
   const { chatId } = useParams();
   const { user } = useAuth();
-  const navigate = useNavigate();
   const { toast } = useToast();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
@@ -90,7 +87,6 @@ const Chat = () => {
     setLoading(true);
 
     try {
-      // Create chat if it doesn't exist
       let chatIdToUse = currentChatId;
       if (!chatIdToUse) {
         chatIdToUse = await createNewChat();
@@ -98,7 +94,6 @@ const Chat = () => {
         setCurrentChatId(chatIdToUse);
       }
 
-      // Add user message to UI
       const userMsg: Message = {
         id: Date.now().toString(),
         role: "user",
@@ -107,21 +102,18 @@ const Chat = () => {
       };
       setMessages((prev) => [...prev, userMsg]);
 
-      // Save user message to DB
       await supabase.from("chat_messages").insert({
         chat_id: chatIdToUse,
         role: "user",
         content: userMessage,
       });
 
-      // Call AI
       const { data, error } = await supabase.functions.invoke("health-chat", {
         body: { message: userMessage, chatId: chatIdToUse },
       });
 
       if (error) throw error;
 
-      // Add AI response to UI
       const aiMsg: Message = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
@@ -130,14 +122,12 @@ const Chat = () => {
       };
       setMessages((prev) => [...prev, aiMsg]);
 
-      // Save AI response to DB
       await supabase.from("chat_messages").insert({
         chat_id: chatIdToUse,
         role: "assistant",
         content: data.response,
       });
 
-      // Update chat title if it's the first message
       if (messages.length === 0) {
         await supabase
           .from("chats")
@@ -157,29 +147,8 @@ const Chat = () => {
   };
 
   return (
-    <div className="flex h-screen flex-col bg-gradient-to-br from-primary-light via-background to-accent">
-      {/* Header */}
-      <header className="glass-header">
-        <div className="mx-auto max-w-5xl px-4 py-4">
-          <div className="flex items-center justify-between">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => navigate("/dashboard")}
-              className="rounded-xl"
-            >
-              <ArrowLeft className="h-5 w-5" />
-            </Button>
-            <div className="flex items-center gap-2">
-              <Heart className="h-6 w-6 text-primary" />
-              <h1 className="text-xl font-semibold hidden sm:inline">HealthMate</h1>
-            </div>
-            <ThemeToggle />
-          </div>
-        </div>
-      </header>
-
-      {/* Messages Container - Centered like Grok */}
+    <div className="flex h-full flex-col bg-gradient-to-br from-primary-light via-background to-accent">
+      {/* Messages Container */}
       <div className="flex-1 overflow-y-auto">
         <div className="mx-auto max-w-3xl px-4 py-8">
           {messages.length === 0 && (
@@ -207,7 +176,7 @@ const Chat = () => {
                 <div
                   className={`max-w-[85%] sm:max-w-[75%] rounded-3xl p-4 ${
                     message.role === "user"
-                      ? "bg-primary text-white ml-auto"
+                      ? "bg-primary text-primary-foreground ml-auto"
                       : "glass-card"
                   }`}
                 >
@@ -237,7 +206,7 @@ const Chat = () => {
       </div>
 
       {/* Disclaimer */}
-      <div className="border-t glass-header">
+      <div className="border-t border-border/50 bg-background/80 backdrop-blur-xl">
         <div className="mx-auto max-w-3xl px-4 py-2">
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
             <AlertCircle className="h-4 w-4 flex-shrink-0" />
@@ -248,8 +217,8 @@ const Chat = () => {
         </div>
       </div>
 
-      {/* Input - Fixed at bottom like Grok */}
-      <div className="glass-header border-t">
+      {/* Input */}
+      <div className="border-t border-border/50 bg-background/80 backdrop-blur-xl">
         <div className="mx-auto max-w-3xl px-4 py-4">
           <div className="flex gap-2">
             <Input
@@ -264,7 +233,7 @@ const Chat = () => {
               onClick={handleSend}
               disabled={!input.trim() || loading}
               size="icon"
-              className="rounded-2xl h-14 w-14 bg-primary hover:bg-primary-hover shrink-0"
+              className="rounded-2xl h-14 w-14 bg-primary hover:bg-primary/90 shrink-0"
             >
               {loading ? (
                 <Loader2 className="h-5 w-5 animate-spin" />
