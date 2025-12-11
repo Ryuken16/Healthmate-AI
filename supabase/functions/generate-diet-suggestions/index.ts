@@ -14,7 +14,7 @@ serve(async (req) => {
   }
 
   try {
-    const { userId, prompt } = await req.json();
+    const { userId, prompt, regenerateSection } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
     const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -25,7 +25,7 @@ serve(async (req) => {
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
-    const systemPrompt = `You are a nutrition and wellness advisor for HealthMate AI. Generate personalized diet and lifestyle suggestions based on the user's specific requirements.
+    let systemPrompt = `You are a nutrition and wellness advisor for HealthMate AI. Generate personalized diet and lifestyle suggestions based on the user's specific requirements.
 
 Analyze the user's prompt and create a comprehensive, personalized diet plan that addresses their:
 - Health goals (weight loss, muscle gain, maintenance, etc.)
@@ -33,7 +33,11 @@ Analyze the user's prompt and create a comprehensive, personalized diet plan tha
 - Lifestyle and activity level
 - Any allergies or health conditions mentioned
 
-Provide detailed, practical suggestions formatted as a well-structured plan with clear sections and actionable advice.`;
+Provide detailed, practical suggestions formatted as a well-structured plan with clear sections for Breakfast, Lunch, Dinner, and Snacks. Include nutritional tips and meal prep advice.`;
+
+    if (regenerateSection) {
+      systemPrompt = `You are a nutrition expert. The user wants to regenerate ONLY the ${regenerateSection} section of their diet plan. Provide 2-3 alternative options for ${regenerateSection} only. Keep suggestions practical and aligned with any dietary restrictions mentioned.`;
+    }
 
     const response = await fetch(
       "https://ai.gateway.lovable.dev/v1/chat/completions",
