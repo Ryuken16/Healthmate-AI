@@ -4,8 +4,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { Send, Loader2, Heart, AlertCircle } from "lucide-react";
-import { useParams } from "react-router-dom";
+import { Send, Loader2, Heart, AlertCircle, History, X } from "lucide-react";
+import { useParams, useNavigate } from "react-router-dom";
+import { ChatHistory } from "@/components/chat/ChatHistory";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 interface Message {
   id: string;
@@ -16,16 +18,19 @@ interface Message {
 
 const Chat = () => {
   const { chatId } = useParams();
+  const navigate = useNavigate();
   const { user } = useAuth();
   const { toast } = useToast();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [currentChatId, setCurrentChatId] = useState<string | null>(chatId || null);
+  const [showHistory, setShowHistory] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (chatId) {
+      setCurrentChatId(chatId);
       loadChatMessages(chatId);
     }
   }, [chatId]);
@@ -79,6 +84,18 @@ const Chat = () => {
     }
   };
 
+  const handleSelectChat = (selectedChatId: string) => {
+    setShowHistory(false);
+    navigate(`/chat/${selectedChatId}`);
+  };
+
+  const handleNewChat = () => {
+    setShowHistory(false);
+    setMessages([]);
+    setCurrentChatId(null);
+    navigate("/chat");
+  };
+
   const handleSend = async () => {
     if (!input.trim() || loading || !user) return;
 
@@ -92,6 +109,7 @@ const Chat = () => {
         chatIdToUse = await createNewChat();
         if (!chatIdToUse) throw new Error("Failed to create chat");
         setCurrentChatId(chatIdToUse);
+        navigate(`/chat/${chatIdToUse}`, { replace: true });
       }
 
       const userMsg: Message = {
@@ -128,10 +146,20 @@ const Chat = () => {
         content: data.response,
       });
 
+      // Update chat title if it's the first message
       if (messages.length === 0) {
         await supabase
           .from("chats")
-          .update({ title: userMessage.slice(0, 50) })
+          .update({ 
+            title: userMessage.slice(0, 50),
+            updated_at: new Date().toISOString()
+          })
+          .eq("id", chatIdToUse);
+      } else {
+        // Update timestamp for existing chats
+        await supabase
+          .from("chats")
+          .update({ updated_at: new Date().toISOString() })
           .eq("id", chatIdToUse);
       }
     } catch (error: any) {
@@ -147,100 +175,137 @@ const Chat = () => {
   };
 
   return (
-    <div className="flex h-full flex-col bg-gradient-to-br from-primary-light via-background to-accent">
-      {/* Messages Container */}
-      <div className="flex-1 overflow-y-auto">
-        <div className="mx-auto max-w-3xl px-4 py-8">
-          {messages.length === 0 && (
-            <div className="flex flex-col items-center justify-center min-h-[60vh] text-center space-y-6">
-              <div className="p-6 rounded-full glass-card">
-                <Heart className="h-16 w-16 text-primary" />
-              </div>
-              <div className="space-y-2">
-                <h2 className="text-3xl font-bold">How can I help you today?</h2>
-                <p className="text-muted-foreground max-w-md">
-                  Ask me about symptoms, medications, or general health questions.
-                </p>
-              </div>
-            </div>
-          )}
+    <div className="flex h-full">
+      {/* Desktop Chat History Sidebar */}
+      <div className="hidden lg:block w-72 border-r border-border/50 bg-background/50">
+        <ChatHistory
+          currentChatId={currentChatId}
+          onSelectChat={handleSelectChat}
+          onNewChat={handleNewChat}
+        />
+      </div>
 
-          <div className="space-y-6">
-            {messages.map((message) => (
-              <div
-                key={message.id}
-                className={`flex ${
-                  message.role === "user" ? "justify-end" : "justify-start"
-                }`}
-              >
-                <div
-                  className={`max-w-[85%] sm:max-w-[75%] rounded-3xl p-4 ${
-                    message.role === "user"
-                      ? "bg-primary text-primary-foreground ml-auto"
-                      : "glass-card"
-                  }`}
-                >
-                  <p className="text-sm sm:text-base leading-relaxed whitespace-pre-wrap">
-                    {message.content}
+      {/* Main Chat Area */}
+      <div className="flex-1 flex flex-col bg-gradient-to-br from-primary-light via-background to-accent">
+        {/* Mobile History Button */}
+        <div className="lg:hidden p-4 border-b border-border/50 bg-background/80 backdrop-blur-xl">
+          <Sheet open={showHistory} onOpenChange={setShowHistory}>
+            <SheetTrigger asChild>
+              <Button variant="outline" size="sm" className="rounded-xl">
+                <History className="h-4 w-4 mr-2" />
+                Chat History
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="left" className="w-80 p-0">
+              <ChatHistory
+                currentChatId={currentChatId}
+                onSelectChat={handleSelectChat}
+                onNewChat={handleNewChat}
+              />
+            </SheetContent>
+          </Sheet>
+        </div>
+
+        {/* Messages Container */}
+        <div className="flex-1 overflow-y-auto">
+          <div className="mx-auto max-w-3xl px-4 py-8">
+            {messages.length === 0 && (
+              <div className="flex flex-col items-center justify-center min-h-[50vh] text-center space-y-6">
+                <div className="p-6 rounded-full glass-card">
+                  <Heart className="h-16 w-16 text-primary" />
+                </div>
+                <div className="space-y-2">
+                  <h2 className="text-3xl font-bold">How can I help you today?</h2>
+                  <p className="text-muted-foreground max-w-md">
+                    Ask me about symptoms, medications, or general health questions.
                   </p>
                 </div>
               </div>
-            ))}
+            )}
 
-            {loading && (
-              <div className="flex justify-start">
-                <div className="glass-card rounded-3xl p-4">
-                  <div className="flex items-center gap-2">
-                    <Loader2 className="h-4 w-4 animate-spin text-primary" />
-                    <span className="text-sm text-muted-foreground">
-                      Thinking...
-                    </span>
+            <div className="space-y-6">
+              {messages.map((message) => (
+                <div
+                  key={message.id}
+                  className={`flex ${
+                    message.role === "user" ? "justify-end" : "justify-start"
+                  }`}
+                >
+                  <div
+                    className={`max-w-[85%] sm:max-w-[75%] rounded-3xl p-4 ${
+                      message.role === "user"
+                        ? "bg-primary text-primary-foreground ml-auto"
+                        : "glass-card"
+                    }`}
+                  >
+                    <p className="text-sm sm:text-base leading-relaxed whitespace-pre-wrap">
+                      {message.content}
+                    </p>
+                    <p className="text-xs opacity-60 mt-2">
+                      {new Date(message.created_at).toLocaleTimeString([], {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </p>
                   </div>
                 </div>
-              </div>
-            )}
-          </div>
+              ))}
 
-          <div ref={messagesEndRef} />
-        </div>
-      </div>
-
-      {/* Disclaimer */}
-      <div className="border-t border-border/50 bg-background/80 backdrop-blur-xl">
-        <div className="mx-auto max-w-3xl px-4 py-2">
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <AlertCircle className="h-4 w-4 flex-shrink-0" />
-            <p>
-              AI provides general information only. Consult healthcare professionals for medical advice.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Input */}
-      <div className="border-t border-border/50 bg-background/80 backdrop-blur-xl">
-        <div className="mx-auto max-w-3xl px-4 py-4">
-          <div className="flex gap-2">
-            <Input
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyPress={(e) => e.key === "Enter" && !e.shiftKey && handleSend()}
-              placeholder="Ask about your health..."
-              className="rounded-2xl bg-card/50 border-primary/20 focus:border-primary px-6 py-6 text-base"
-              disabled={loading}
-            />
-            <Button
-              onClick={handleSend}
-              disabled={!input.trim() || loading}
-              size="icon"
-              className="rounded-2xl h-14 w-14 bg-primary hover:bg-primary/90 shrink-0"
-            >
-              {loading ? (
-                <Loader2 className="h-5 w-5 animate-spin" />
-              ) : (
-                <Send className="h-5 w-5" />
+              {loading && (
+                <div className="flex justify-start">
+                  <div className="glass-card rounded-3xl p-4">
+                    <div className="flex items-center gap-2">
+                      <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                      <span className="text-sm text-muted-foreground">
+                        Thinking...
+                      </span>
+                    </div>
+                  </div>
+                </div>
               )}
-            </Button>
+            </div>
+
+            <div ref={messagesEndRef} />
+          </div>
+        </div>
+
+        {/* Disclaimer */}
+        <div className="border-t border-border/50 bg-background/80 backdrop-blur-xl">
+          <div className="mx-auto max-w-3xl px-4 py-2">
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <AlertCircle className="h-4 w-4 flex-shrink-0" />
+              <p>
+                AI provides general information only. Consult healthcare professionals for medical advice.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Input */}
+        <div className="border-t border-border/50 bg-background/80 backdrop-blur-xl">
+          <div className="mx-auto max-w-3xl px-4 py-4">
+            <div className="flex gap-2">
+              <Input
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyPress={(e) => e.key === "Enter" && !e.shiftKey && handleSend()}
+                placeholder="Ask about your health..."
+                className="rounded-2xl bg-card/50 border-primary/20 focus:border-primary px-6 py-6 text-base"
+                disabled={loading}
+              />
+              <Button
+                onClick={handleSend}
+                disabled={!input.trim() || loading}
+                size="icon"
+                className="rounded-2xl h-14 w-14 bg-primary hover:bg-primary/90 shrink-0"
+              >
+                {loading ? (
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                ) : (
+                  <Send className="h-5 w-5" />
+                )}
+              </Button>
+            </div>
           </div>
         </div>
       </div>
