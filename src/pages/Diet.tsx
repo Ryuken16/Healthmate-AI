@@ -1,17 +1,14 @@
 import { useState } from "react";
 import { useAuth } from "@/components/auth/AuthProvider";
-import { ThemeToggle } from "@/components/ThemeToggle";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Utensils, Loader2, Sparkles, Heart } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { Utensils, Loader2, Sparkles, Heart } from "lucide-react";
 
 const Diet = () => {
   const { user } = useAuth();
-  const navigate = useNavigate();
   const { toast } = useToast();
   const [prompt, setPrompt] = useState("");
   const [suggestions, setSuggestions] = useState("");
@@ -53,30 +50,8 @@ const Diet = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-light via-background to-accent">
-      {/* Header */}
-      <header className="glass-header sticky top-0 z-50">
-        <div className="container mx-auto max-w-6xl px-4 py-4">
-          <div className="flex items-center justify-between">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => navigate("/dashboard")}
-              className="rounded-xl"
-            >
-              <ArrowLeft className="h-5 w-5" />
-            </Button>
-            <div className="flex items-center gap-2">
-              <Utensils className="h-6 w-6 text-primary" />
-              <h1 className="text-xl font-semibold hidden sm:inline">Diet Planner</h1>
-            </div>
-            <ThemeToggle />
-          </div>
-        </div>
-      </header>
-
-      {/* Content */}
-      <div className="container mx-auto px-4 py-8 max-w-6xl">
+    <div className="min-h-full bg-gradient-to-br from-primary-light via-background to-accent p-4 md:p-8">
+      <div className="max-w-6xl mx-auto">
         {/* Hero Section */}
         <div className="mb-8">
           <Card className="glass-card p-6 md:p-8 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent border-primary/20">
@@ -117,7 +92,7 @@ const Diet = () => {
             <Button
               onClick={handleGenerate}
               disabled={!prompt.trim() || loading}
-              className="w-full rounded-xl bg-primary hover:bg-primary-hover h-12 text-base"
+              className="w-full rounded-xl bg-primary hover:bg-primary/90 h-12 text-base"
             >
               {loading ? (
                 <>

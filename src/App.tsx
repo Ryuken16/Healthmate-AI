@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/components/auth/AuthProvider";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import { AppLayout } from "@/components/layout/AppLayout";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
@@ -31,7 +32,9 @@ const App = () => (
                 path="/dashboard"
                 element={
                   <ProtectedRoute>
-                    <Dashboard />
+                    <AppLayout>
+                      <Dashboard />
+                    </AppLayout>
                   </ProtectedRoute>
                 }
               />
@@ -39,7 +42,9 @@ const App = () => (
                 path="/chat"
                 element={
                   <ProtectedRoute>
-                    <Chat />
+                    <AppLayout>
+                      <Chat />
+                    </AppLayout>
                   </ProtectedRoute>
                 }
               />
@@ -47,7 +52,9 @@ const App = () => (
                 path="/chat/:chatId"
                 element={
                   <ProtectedRoute>
-                    <Chat />
+                    <AppLayout>
+                      <Chat />
+                    </AppLayout>
                   </ProtectedRoute>
                 }
               />
@@ -55,7 +62,9 @@ const App = () => (
                 path="/reports"
                 element={
                   <ProtectedRoute>
-                    <Reports />
+                    <AppLayout>
+                      <Reports />
+                    </AppLayout>
                   </ProtectedRoute>
                 }
               />
@@ -63,7 +72,9 @@ const App = () => (
                 path="/diet"
                 element={
                   <ProtectedRoute>
-                    <Diet />
+                    <AppLayout>
+                      <Diet />
+                    </AppLayout>
                   </ProtectedRoute>
                 }
               />

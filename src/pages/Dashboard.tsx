@@ -1,19 +1,11 @@
 import { useAuth } from "@/components/auth/AuthProvider";
-import { ThemeToggle } from "@/components/ThemeToggle";
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { supabase } from "@/integrations/supabase/client";
-import { Heart, MessageSquare, FileText, Utensils, LogOut, Sparkles, TrendingUp, Activity } from "lucide-react";
+import { MessageSquare, FileText, Utensils, Sparkles, TrendingUp, Activity } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const Dashboard = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
-
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    navigate("/");
-  };
 
   const quickActions = [
     {
@@ -40,31 +32,8 @@ const Dashboard = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-light via-background to-accent">
-      {/* Header */}
-      <header className="glass-header sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Heart className="h-8 w-8 text-primary" />
-              <h1 className="text-2xl font-bold">HealthMate</h1>
-            </div>
-            <div className="flex items-center gap-3">
-              <ThemeToggle />
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={handleLogout}
-                className="rounded-xl"
-              >
-                <LogOut className="h-5 w-5" />
-              </Button>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      <div className="container mx-auto px-4 py-8 max-w-7xl">
+    <div className="min-h-full bg-gradient-to-br from-primary-light via-background to-accent p-4 md:p-8">
+      <div className="max-w-7xl mx-auto">
         {/* Welcome Section */}
         <div className="mb-8">
           <Card className="glass-card p-6 md:p-8 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent border-primary/20">
